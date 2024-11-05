@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Timetable Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Times+New+Roman&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .title {
+            font-family: 'Times New Roman', serif;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-bold text-center mb-8 title">AI Timetable Maker</h1>
+        <div class="form-container bg-white p-6 rounded-lg shadow-lg">
+            <form id="timetableForm" class="space-y-4">
+                <div>
+                    <label for="studyHours" class="block text-lg font-medium">Study Hours per Day</label>
+                    <input type="number" id="studyHours" name="studyHours" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="breakTime" class="block text-lg font-medium">Break Time (minutes)</label>
+                    <input type="number" id="breakTime" name="breakTime" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="fridayPeriods" class="block text-lg font-medium">Number of Periods on Friday</label>
+                    <input type="number" id="fridayPeriods" name="fridayPeriods" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="subjects" class="block text-lg font-medium">Subjects (comma separated)</label>
+                    <input type="text" id="subjects" name="subjects" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="studyTips" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Study Tips and Ideas</button>
+                </div>
+            </form>
+        </div>
+        <div id="timetableResult" class="mt-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">Generated Timetable</h2>
+            <div id="timetable" class="bg-white p-6 rounded-lg shadow-lg text-gray-800"></div>
+            <button id="downloadTimetable" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Download Timetable</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('timetableForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const studyHours = document.getElementById('studyHours').value;
+            const breakTime = document.getElementById('breakTime').value;
+            const fridayPeriods = document.getElementById('fridayPeriods').value;
+            const subjects = document.getElementById('subjects').value.split(',');
+
+            let timetableHTML = '<table class="min-w-full bg-white text-gray-800"><thead><tr><th class="py-2">Day</th><th class="py-2">Periods</th></tr></thead><tbody>';
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            days.forEach(day => {
+                timetableHTML += `<tr><td class="border px-4 py-2">${day}</td><td class="border px-4 py-2">`;
+                const periods = day === 'Friday' ? fridayPeriods : 8;
+                for (let i = 1; i <= periods; i++) {
+                    const subject = subjects[(i - 1) % subjects.length].trim();
+                    timetableHTML += `Period ${i}: ${subject} <br>`;
+                }
+                timetableHTML += '</td></tr>';
+            });
+            timetableHTML += '</tbody></table>';
+
+            document.getElementById('timetable').innerHTML = timetableHTML;
+            document.getElementById('timetableResult').classList.remove('hidden');
+        });
+
+        document.getElementById('downloadTimetable').addEventListener('click', function() {
+            const timetable = document.getElementById('timetable').innerHTML;
+            const blob = new Blob([timetable], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'timetable.html';
+            link.click();
+        });
+
+        document.getElementById('studyTips').addEventListener('click', function() {
+            window.open('https://www.youtube.com/results?search_query=study+motivation', '_blank');
+        });
+    </script>
+</body>
+</html>
